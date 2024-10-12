@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>बेवकूफों की जंग: बचा सको तो बचाओ!</title>
+
+  <!-- Embedded CSS -->
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000;
+      color: #fff;
+    }
+
+    #gameContainer {
+      position: relative;
+      width: 400px;
+      height: 600px;
+      border: 2px solid #fff;
+      background-color: #333;
+      overflow: hidden;
+    }
+
+    #player {
+      position: absolute;
+      bottom: 0;
+      left: 180px;
+      width: 40px;
+      height: 40px;
+      background-color: limegreen;
+    }
+
+    .fallingObject {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: red;
+    }
+
+    .powerup {
+      background-color: gold;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    #lives {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    #gameOverMessage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: Arial, sans-serif;
+      font-size: 24px;
+      color: #fff;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="gameContainer">
+    <div id="player"></div>
+    <div id="score">Score: 0</div>
+    <div id="lives">Lives: 3</div>
+    <div id="gameOverMessage">अरे! Deepanshu होता तो जीत जाता!<br><button onclick="restartGame()">फिर से कोशिश करो</button></div>
+  </div>
+
+  <!-- Embedded JavaScript -->
+  <script>
+    let player = document.getElementById("player");
+    let scoreDisplay = document.getElementById("score");
+    let livesDisplay = document.getElementById("lives");
+    let gameOverMessage = document.getElementById("gameOverMessage");
+
+    let playerPosition = { x: 180, y: 550 };
+    let fallingObjects = [];
+    let score = 0;
+    let lives = 3;
+
+    // Move player with arrow keys
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft" && playerPosition.x > 0) {
+        playerPosition.x -= 20;
+      } else if (event.key === "ArrowRight" && playerPosition.x < 360) {
+        playerPosition.x += 20;
+      } else if (event.key === "ArrowUp" && playerPosition.y > 0) {
+        playerPosition.y -= 20;
+      } else if (event.key === "ArrowDown" && playerPosition.y < 560) {
+        playerPosition.y += 20;
+      }
+      player.style.left = playerPosition.x + "px";
+      player.style.top = playerPosition.y + "px";
+    });
+
+    // Function to create a falling object
+    function createFallingObject() {
+      let obj = document.createElement("div");
+      obj.classList.add("fallingObject");
+      obj.style.left = Math.floor(Math.random() * 380) + "px";
+      obj.style.top = "0px";
+      gameContainer.appendChild(obj);
+      fallingObjects.push(obj);
+    }
+
+    // Function to create a power-up (Deepanshu Shield)
+    function createPowerup() {
+      let powerup = document.createElement("div");
+      powerup.classList.add("fallingObject", "powerup");
+      powerup.style.left = Math.floor(Math.random() * 380) + "px";
+      powerup.style.top = "0px";
+      gameContainer.appendChild(powerup);
+      fallingObjects.push(powerup);
+    }
+
+    // Move falling objects and check for collisions
+    function moveFallingObjects() {
+      fallingObjects.forEach((obj, index) => {
+        let objPosition = obj.offsetTop;
+        obj.style.top = objPosition + 5 + "px";
+
+        // Collision detection with player
+        if (objPosition >= playerPosition.y - 40 &&
+            obj.offsetLeft >= playerPosition.x &&
+            obj.offsetLeft <= playerPosition.x + 40) {
+          if (obj.classList.contains("powerup")) {
+            lives++;
+            alert("Deepanshu ने बचा लिया!");
+          } else {
+            score++;
+          }
+          obj.remove();
+          fallingObjects.splice(index, 1);
+        }
+
+        // Remove object if it falls out of bounds
+        if (objPosition > 600) {
+          obj.remove();
+          fallingObjects.splice(index, 1);
+          loseLife();
+        }
+
+        // Update score and lives display
+        scoreDisplay.innerHTML = "Score: " + score;
+        livesDisplay.innerHTML = "Lives: " + lives;
+      });
+    }
+
+    // Lose a life and check for game over
+    function loseLife() {
+      lives--;
+      if (lives <= 0) {
+        gameOver();
+      }
+    }
+
+    // Game over function
+    function gameOver() {
+      gameOverMessage.style.display = "block";
+    }
+
+    // Restart game
+    function restartGame() {
+      location.reload();
+    }
+
+    // Run game loop
+    setInterval(() => {
+      moveFallingObjects();
+    }, 50);
+
+    // Spawn objects and power-ups
+    setInterval(() => {
+      createFallingObject();
+      if (Math.random() > 0.8) {
+        createPowerup();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
