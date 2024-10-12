@@ -13,4 +13,4 @@
 - **Game Over?**: You’ll get a sarcastic message. Try again if you're not a बेवकूफ!
 
 ## 📲 Play the Game
-[Play Here!](https://your-github-username.github.io/repo-name/)
+[Play Here!](https://deepanshu-analyst.github.io/Game/)
